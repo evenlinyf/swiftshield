@@ -148,7 +148,7 @@ extension SourceKitObfuscator {
     }
 
     func obfuscate(index: IndexedFile) throws {
-        logger.log("--- Obfuscating \(index.file.name)")
+        logger.log("--- Obfuscating indexedFile \(index.file.name)")
         var referenceArray = [Reference]()
         index.response.recurseEntities { [unowned self] dict in
             guard let kindId: SKUID = dict[self.keys.kind],
@@ -182,7 +182,7 @@ extension SourceKitObfuscator {
         guard results.isEmpty == false else {
             return
         }
-        logger.log("--- Obfuscating \(plist.name)")
+        logger.log("--- Obfuscating plist \(plist.name)")
         for result in results.reversed() {
             let value = String(result.captureGroup(0, originalString: data).dropLast())
             let range = result.captureGroupRange(0, originalString: data)
@@ -201,6 +201,9 @@ extension SourceKitObfuscator {
     func obfuscate(name: String) -> String {
         let cachedResult = dataStore.obfuscationDictionary[name]
         guard cachedResult == nil else {
+            if dataStore.obfuscatedNames.contains(name) == false {
+                dataStore.obfuscatedNames.insert(cachedResult!)
+            }
             return cachedResult!
         }
         let size = 32

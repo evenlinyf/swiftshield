@@ -24,7 +24,7 @@ public final class SwiftShieldController {
             let map = try interactor.obfuscate(modules: modules)
             logger.log("--- Tagging projects")
             try interactor.markProjectsAsObfuscated()
-            logger.log("--- Preparing conversion map")
+            logger.log("--- Preparing conversion map, map count = \(map.obfuscationDictionary.keys.count)")
             try interactor.prepare(map: map, date: Date())
         } catch {
             logger.log(error.localizedDescription)

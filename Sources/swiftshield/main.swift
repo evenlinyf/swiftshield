@@ -16,6 +16,9 @@ extension Swiftshield {
 
         @Option(name: .shortAndLong, help: "The main scheme from the project to build.")
         var scheme: String
+        
+        @Option(name: [.long, .customShort("m")], help: "The path to the previously generated conversion map which you wanna obfuscate with this time.")
+        var conversionMap: String?
 
         @Option(name: .shortAndLong, help: "A list of targets, separated by a comma, that should NOT be obfuscated.")
         var ignoreTargets: String?
@@ -40,6 +43,7 @@ extension Swiftshield {
             let namesToIgnore = Set((ignoreNames ?? "").components(separatedBy: ","))
             let runner = SwiftSwiftAssembler.generate(
                 projectPath: projectFile, scheme: scheme,
+                conversionMap: conversionMap,
                 modulesToIgnore: modulesToIgnore,
                 namesToIgnore: namesToIgnore,
                 ignorePublic: ignorePublic,
