@@ -4,7 +4,7 @@ import SwiftShieldCore
 
 struct Swiftshield: ParsableCommand {
     static var configuration = CommandConfiguration(
-        abstract: "SwiftShield 4.2.1",
+        abstract: "SwiftShield 4.2.1.2",
         subcommands: [Obfuscate.self, Deobfuscate.self]
     )
 }
@@ -19,6 +19,9 @@ extension Swiftshield {
         
         @Option(name: [.long, .customShort("m")], help: "The path to the previously generated conversion map which you wanna obfuscate with this time.")
         var conversionMap: String?
+        
+        @Option(name: .shortAndLong, help: "The obfuscate format you want (i.e prefix_%@), nil for random string")
+        var obfuscateFormat: String?
 
         @Option(name: .shortAndLong, help: "A list of targets, separated by a comma, that should NOT be obfuscated.")
         var ignoreTargets: String?
@@ -44,6 +47,7 @@ extension Swiftshield {
             let runner = SwiftSwiftAssembler.generate(
                 projectPath: projectFile, scheme: scheme,
                 conversionMap: conversionMap,
+                obfuscateFormat: obfuscateFormat,
                 modulesToIgnore: modulesToIgnore,
                 namesToIgnore: namesToIgnore,
                 ignorePublic: ignorePublic,

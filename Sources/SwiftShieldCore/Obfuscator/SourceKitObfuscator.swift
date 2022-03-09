@@ -206,23 +206,30 @@ extension SourceKitObfuscator {
             }
             return cachedResult!
         }
-        let size = 32
-        let letters: [Character] = Array("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-        let numbers: [Character] = Array("0123456789")
-        let lettersAndNumbers = letters + numbers
-        var randomString = ""
-        for i in 0 ..< size {
-            let characters: [Character] = i == 0 ? letters : lettersAndNumbers
-            let rand = Int.random(in: 0 ..< characters.count)
-            let nextChar = characters[rand]
-            randomString.append(nextChar)
+        
+        var obfuscatedString = ""
+        
+        if let obfuscateFormat = dataStore.obfuscateFormat {
+            obfuscatedString = String(format: obfuscateFormat, name)
+        } else {
+            let size = 32
+            let letters: [Character] = Array("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+            let numbers: [Character] = Array("0123456789")
+            let lettersAndNumbers = letters + numbers
+            for i in 0 ..< size {
+                let characters: [Character] = i == 0 ? letters : lettersAndNumbers
+                let rand = Int.random(in: 0 ..< characters.count)
+                let nextChar = characters[rand]
+                obfuscatedString.append(nextChar)
+            }
         }
-        guard dataStore.obfuscatedNames.contains(randomString) == false else {
+        
+        guard dataStore.obfuscatedNames.contains(obfuscatedString) == false else {
             return obfuscate(name: name)
         }
-        dataStore.obfuscatedNames.insert(randomString)
-        dataStore.obfuscationDictionary[name] = randomString
-        return randomString
+        dataStore.obfuscatedNames.insert(obfuscatedString)
+        dataStore.obfuscationDictionary[name] = obfuscatedString
+        return obfuscatedString
     }
 
     func obfuscate(fileContents: String, fromReferences references: [Reference]) -> String {

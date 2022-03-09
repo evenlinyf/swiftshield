@@ -5,6 +5,7 @@ public enum SwiftSwiftAssembler {
         projectPath: String,
         scheme: String,
         conversionMap: String?,
+        obfuscateFormat: String?,
         modulesToIgnore: Set<String>,
         namesToIgnore: Set<String>,
         ignorePublic: Bool,
@@ -28,7 +29,6 @@ public enum SwiftSwiftAssembler {
         )
 
         let dataStore = SourceKitObfuscatorDataStore.init()
-        
         if let mapPath = conversionMap {
             if let mapString = try? File(path: mapPath).read() {
                 if let conversionMapObj = ConversionMap(mapString: mapString) {
@@ -36,8 +36,10 @@ public enum SwiftSwiftAssembler {
                     logger.log("--- Use old map file to obfuscate, map count = \(conversionMapObj.obfuscationDictionary.keys.count)")
                 }
             }
-            
         }
+        
+        dataStore.obfuscateFormat = obfuscateFormat
+        
         let sourceKit = SourceKit(logger: logger)
         let obfuscator = SourceKitObfuscator(
             sourceKit: sourceKit,
