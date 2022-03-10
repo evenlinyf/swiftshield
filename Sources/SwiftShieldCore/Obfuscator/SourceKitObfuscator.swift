@@ -208,20 +208,14 @@ extension SourceKitObfuscator {
         }
         
         var obfuscatedString = ""
-        
-        if let obfuscateFormat = dataStore.obfuscateFormat {
-            obfuscatedString = String(format: obfuscateFormat, name)
-        } else {
-            let size = 32
-            let letters: [Character] = Array("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-            let numbers: [Character] = Array("0123456789")
-            let lettersAndNumbers = letters + numbers
-            for i in 0 ..< size {
-                let characters: [Character] = i == 0 ? letters : lettersAndNumbers
-                let rand = Int.random(in: 0 ..< characters.count)
-                let nextChar = characters[rand]
-                obfuscatedString.append(nextChar)
-            }
+        switch dataStore.obfuscateType() {
+        case .random:
+            obfuscatedString = randomString()
+        case .format:
+            obfuscatedString = String(format: dataStore.obfuscateFormat!, name)
+        case .replace:
+            let values = dataStore.obfuscateFormat!.components(separatedBy: "%rp")
+            obfuscatedString = name.replacingOccurrences(of: values.first!, with: values.last!)
         }
         
         guard dataStore.obfuscatedNames.contains(obfuscatedString) == false else {
@@ -230,6 +224,21 @@ extension SourceKitObfuscator {
         dataStore.obfuscatedNames.insert(obfuscatedString)
         dataStore.obfuscationDictionary[name] = obfuscatedString
         return obfuscatedString
+    }
+    
+    func randomString(_ length: Int = 32) -> String {
+        var randomString = ""
+        let size = length
+        let letters: [Character] = Array("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+        let numbers: [Character] = Array("0123456789")
+        let lettersAndNumbers = letters + numbers
+        for i in 0 ..< size {
+            let characters: [Character] = i == 0 ? letters : lettersAndNumbers
+            let rand = Int.random(in: 0 ..< characters.count)
+            let nextChar = characters[rand]
+            randomString.append(nextChar)
+        }
+        return randomString
     }
 
     func obfuscate(fileContents: String, fromReferences references: [Reference]) -> String {
